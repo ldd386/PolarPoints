@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 
 public class PolarJsonTokenExtractor extends OAuth2AccessTokenJsonExtractor {
 
-    private static final Pattern USER_ID_REGEX_PATTERN = Pattern.compile("\"x_user_id\"\\s*:\\s*\"(\\S*?)\"");
-    private static final Pattern ERROR_REGEX_PATTERN = Pattern.compile("\"errorType\"\\s*:\\s*\"(\\S*?)\"");
+    private static final Pattern USER_ID_REGEX_PATTERN = Pattern.compile("\"x_user_id\"\\s*:(\\d*)");
+    private static final Pattern ERROR_REGEX_PATTERN = Pattern.compile("\"error\"\\s*:\\s*\"(\\S*?)\"");
     private static final Pattern ERROR_DESCRIPTION_REGEX_PATTERN = Pattern.compile("\"message\"\\s*:\\s*\"([^\"]*?)\"");
 
     protected PolarJsonTokenExtractor() {

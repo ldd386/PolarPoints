@@ -54,19 +54,31 @@ class PolarApi {
     }
 
     fun loadProfile() {
-        val profileUrl = "https://www.polaraccesslink.com/v3/users/42989986"
-        // Now let's go and ask for a protected resource!
-        // This will get the profile for this user
-        Log.i(LOG_TAG, "Now we're going to access the user profile...")
-        val request = OAuthRequest(
+        val profileUrl = "https://www.polaraccesslink.com/v3/users/%s"
+        Log.i(LOG_TAG, String.format( "Now we're going to access the user profile for %s", accessToken!!.userId))
+        val getRequest = OAuthRequest(
             Verb.GET,
             String.format(profileUrl, accessToken!!.userId)
         )
-        request.addHeader("x-li-format", "json")
-        service!!.signRequest(accessToken, request)
-        val response = service!!.execute(request)
-        Log.i(LOG_TAG, "get profile HTTP code: " + response.code)
-        Log.i(LOG_TAG, "get profile HTTP body: " + response.body)
+        getRequest.addHeader("x-li-format", "json")
+        service!!.signRequest(accessToken, getRequest)
+        val getResponse = service!!.execute(getRequest)
+        Log.i(LOG_TAG, "get user HTTP code: " + getResponse.code)
+        if(getResponse.code == 200){
+            Log.i(LOG_TAG, "get user HTTP body: " + getResponse.body)
+        }
+        if(getResponse.code == 204){
+            val putRequest = OAuthRequest(
+                Verb.POST,
+                String.format("https://www.polaraccesslink.com/v3/users/", accessToken!!.userId))
+            putRequest.addHeader("Content-Type", "application/json;charset=UTF-8")
+            putRequest.setPayload(String.format("{\"member-id\":\"%s\"}",accessToken!!.userId))
+            service!!.signRequest(accessToken, putRequest)
+            val putResponse = service!!.execute(putRequest)
+            Log.i(LOG_TAG, "put user HTTP code: " + putResponse.code)
+            Log.i(LOG_TAG, "put user HTTP body: " + putResponse.body)
+        }
+
     }
 
     private fun getGson() : Gson {
