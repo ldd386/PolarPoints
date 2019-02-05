@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class PolarOAuth2AccessToken extends OAuth2AccessToken {
 
-    private static final long serialVersionUID = -6374486860742407422L;
+    private static final long serialVersionUID = -1930069873847693076L;
 
     private final String userId;
 
