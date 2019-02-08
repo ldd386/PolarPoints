@@ -3,7 +3,7 @@ package ch.example.polarpoints.api.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Transaction {
+public class ActivityTransaction {
     @SerializedName("transaction-id")
     @Expose
     private Integer transactionId;

@@ -3,8 +3,10 @@ package ch.example.polarpoints.api
 import android.util.Log
 import ch.example.polarpoints.api.adapters.LocalDateAdapter
 import ch.example.polarpoints.api.adapters.LocalTimeAdapter
+import ch.example.polarpoints.api.model.Activities
+import ch.example.polarpoints.api.model.Activity
 import ch.example.polarpoints.api.model.Exercises
-import ch.example.polarpoints.api.model.Transaction
+import ch.example.polarpoints.api.model.ExerciseTransaction
 
 import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.OAuthRequest
@@ -56,11 +58,11 @@ class PolarApi {
     }
 
     fun loadProfile() {
-        val profileUrl = "https://www.polaraccesslink.com/v3/users/%s"
+        val profileUrl =String.format( "https://www.polaraccesslink.com/v3/users/%s", accessToken!!.userId)
         Log.i(LOG_TAG, String.format( "Now we're going to access the user profile for %s", accessToken!!.userId))
         val getRequest = OAuthRequest(
             Verb.GET,
-            String.format(profileUrl, accessToken!!.userId)
+            profileUrl
         )
         getRequest.addHeader("x-li-format", "json")
         service!!.signRequest(accessToken, getRequest)
@@ -82,37 +84,49 @@ class PolarApi {
         }
     }
 
-    fun createTransaction() : Transaction? {
+    fun createExerciseTransaction() : ExerciseTransaction? {
         val transactionUrl = String.format(
             "https://www.polaraccesslink.com/v3/users/%s/exercise-transactions",accessToken!!.userId)
-        Log.i(LOG_TAG, "Now we're going to create a transaction...")
+        Log.i(LOG_TAG, "Now we're going to create an exercise transaction...")
         val request = OAuthRequest(
             Verb.POST,
-            String.format(transactionUrl, accessToken!!.userId)
+            transactionUrl
         )
         request.addHeader("x-li-format", "json")
         service!!.signRequest(accessToken, request)
         val response = service!!.execute(request)
-        Log.i(LOG_TAG, "create transaction result code: " + response.code)
-        Log.i(LOG_TAG, "create transaction result body: " + response.body)
+        Log.i(LOG_TAG, "create exercise transaction result code: " + response.code)
+        Log.i(LOG_TAG, "create exercise transaction result body: " + response.body)
         val gson = getGson()
-        return gson.fromJson(response.body, Transaction::class.java)
+        return gson.fromJson(response.body, ExerciseTransaction::class.java)
+    }
+
+    fun commitExerciseTransaction(transactionId: Int) {
+        val transactionUrl = String.format(
+            "https://www.polaraccesslink.com/v3/users/%s/exercise-transactions/%s",
+            accessToken!!.userId, transactionId)
+        Log.i(LOG_TAG, "Now we're going to commit exercise transaction..")
+        val request = OAuthRequest(Verb.PUT,transactionUrl)
+        request.addHeader("x-li-format", "json")
+        service!!.signRequest(accessToken, request)
+        val response = service!!.execute(request)
+        Log.i(LOG_TAG, "commit exercise transaction result code: " + response.code)
     }
 
     fun listExercisesInTransaction(transactionId : Int ): Exercises? {
         val transactionUrl = String.format(
             "https://www.polaraccesslink.com/v3/users/%s/exercise-transactions/%s",
                 accessToken!!.userId, transactionId)
-        Log.i(LOG_TAG, "Now we're going to access exercises In Transaction..")
+        Log.i(LOG_TAG, "Now we're going to list exercises In ExerciseTransaction..")
         val request = OAuthRequest(
             Verb.GET,
-            String.format(transactionUrl, accessToken!!.userId)
+            transactionUrl
         )
         request.addHeader("x-li-format", "json")
         service!!.signRequest(accessToken, request)
         val response = service!!.execute(request)
-        Log.i(LOG_TAG, "create transaction result code: " + response.code)
-        Log.i(LOG_TAG, "create transaction result body: " + response.body)
+        Log.i(LOG_TAG, "list exercises transaction result code: " + response.code)
+        Log.i(LOG_TAG, "list exercises transaction result body: " + response.body)
         val gson = getGson()
         return gson.fromJson(response.body, Exercises::class.java)
 
@@ -122,18 +136,85 @@ class PolarApi {
         val transactionExerciseHRZUrl = String.format(
             "https://www.polaraccesslink.com/v3/users/%s/exercise-transactions/%s/exercises/%s/heart-rate-zones",
             accessToken!!.userId, transactionId, exerciseId)
-        Log.i(LOG_TAG, "Now we're going to access exercises In Transaction..")
+        Log.i(LOG_TAG, "Now we're going to access heartrate In Exercise in Transaction..")
         val request = OAuthRequest(
             Verb.GET,
-            String.format(transactionExerciseHRZUrl, accessToken!!.userId)
+            transactionExerciseHRZUrl
         )
         request.addHeader("x-li-format", "json")
         service!!.signRequest(accessToken, request)
         val response = service!!.execute(request)
-        Log.i(LOG_TAG, "create transaction result code: " + response.code)
-        Log.i(LOG_TAG, "create transaction result body: " + response.body)
+        Log.i(LOG_TAG, "get heartrate in transaction result code: " + response.code)
+        Log.i(LOG_TAG, "get heartrate in transaction result body: " + response.body)
 
     }
+
+    fun createActivityTransaction() : ExerciseTransaction? {
+        val transactionUrl = String.format(
+            "https://www.polaraccesslink.com/v3/users/%s/activity-transactions",accessToken!!.userId)
+        Log.i(LOG_TAG, "Now we're going to create an activity transaction...")
+        val request = OAuthRequest(
+            Verb.POST,
+            transactionUrl
+        )
+        request.addHeader("x-li-format", "json")
+        service!!.signRequest(accessToken, request)
+        val response = service!!.execute(request)
+        Log.i(LOG_TAG, "create activity transaction result code: " + response.code)
+        Log.i(LOG_TAG, "create activity transaction result body: " + response.body)
+        val gson = getGson()
+        return gson.fromJson(response.body, ExerciseTransaction::class.java)
+    }
+
+    fun listActivitiesInTransaction(transactionId : Int ): Activities? {
+        val transactionUrl = String.format(
+            "https://www.polaraccesslink.com/v3/users/%s/activity-transactions/%s",
+            accessToken!!.userId, transactionId)
+        Log.i(LOG_TAG, "Now we're going to access activity In Transaction..")
+        val request = OAuthRequest(
+            Verb.GET,
+            transactionUrl
+        )
+        request.addHeader("x-li-format", "json")
+        service!!.signRequest(accessToken, request)
+        val response = service!!.execute(request)
+        Log.i(LOG_TAG, "list activities in transaction result code: " + response.code)
+        Log.i(LOG_TAG, "list activities in transaction result body: " + response.body)
+        val gson = getGson()
+        return gson.fromJson(response.body, Activities::class.java)
+
+    }
+
+    fun commitActivityTransaction(transactionId: Int) {
+        val transactionUrl = String.format(
+            "https://www.polaraccesslink.com/v3/users/%s/activity-transactions/%s",
+            accessToken!!.userId, transactionId)
+        Log.i(LOG_TAG, "Now we're going to commit activity transaction..")
+        val request = OAuthRequest(Verb.PUT,transactionUrl)
+        request.addHeader("x-li-format", "json")
+        service!!.signRequest(accessToken, request)
+        val response = service!!.execute(request)
+        Log.i(LOG_TAG, "commit activity transaction result code: " + response.code)
+    }
+
+    fun getActivitySummary(transactionId : Int, activityId : Int) : Activity{
+        val activitySummaryUrl = String.format(
+            "https://www.polaraccesslink.com/v3/users/%s/activity-transactions/%s/activities/%s",
+            accessToken!!.userId, transactionId, activityId)
+        Log.i(LOG_TAG, "Now we're going to access activity summary..")
+        val request = OAuthRequest(
+            Verb.GET,
+            activitySummaryUrl
+        )
+        request.addHeader("x-li-format", "json")
+        service!!.signRequest(accessToken, request)
+        val response = service!!.execute(request)
+        Log.i(LOG_TAG, "activity summary result code: " + response.code)
+        Log.i(LOG_TAG, "activity summary result body: " + response.body)
+        val gson = getGson()
+        return gson.fromJson(response.body, Activity::class.java)
+    }
+
     private fun getGson() : Gson {
         return GsonBuilder()
             .setPrettyPrinting()
