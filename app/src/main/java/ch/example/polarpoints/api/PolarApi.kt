@@ -78,9 +78,45 @@ class PolarApi {
             Log.i(LOG_TAG, "put user HTTP code: " + putResponse.code)
             Log.i(LOG_TAG, "put user HTTP body: " + putResponse.body)
         }
-
     }
 
+    fun createTransaction() {
+        val transactionUrl = String.format(
+            "https://www.polaraccesslink.com/v3/users/%s/exercise-transactions",accessToken!!.userId)
+        Log.i(LOG_TAG, "Now we're going to create a transaction...")
+        val request = OAuthRequest(
+            Verb.POST,
+            String.format(transactionUrl, accessToken!!.userId)
+        )
+        request.addHeader("x-li-format", "json")
+        service!!.signRequest(accessToken, request)
+        val response = service!!.execute(request)
+        Log.i(LOG_TAG, "create transaction result code: " + response.code)
+        Log.i(LOG_TAG, "create transaction result body: " + response.body)
+    }
+
+    fun listExercisesInTransaction(transactionId : Int ) {
+        val transactionUrl = String.format(
+            "https://www.polaraccesslink.com/v3/users/%s/exercise-transactions/%s/exercises/%s",
+                accessToken!!.userId, transactionId)
+        Log.i(LOG_TAG, "Now we're going to access the steps intra-day...")
+        val request = OAuthRequest(
+            Verb.GET,
+            String.format(transactionUrl, accessToken!!.userId)
+        )
+        request.addHeader("x-li-format", "json")
+        service!!.signRequest(accessToken, request)
+        val response = service!!.execute(request)
+        Log.i(LOG_TAG, "create transaction result code: " + response.code)
+        Log.i(LOG_TAG, "create transaction result body: " + response.body)
+    }
+
+    fun getHeartRateZonesForExercise(transactionId : Int, exerciseId : Int){
+        val transactionExerciseUrl = String.format(
+            "https://www.polaraccesslink.com/v3/users/%s/exercise-transactions/%s/exercises/%s/heart-rate-zones",
+            accessToken!!.userId, transactionId, exerciseId)
+
+    }
     private fun getGson() : Gson {
         return GsonBuilder()
             .setPrettyPrinting()

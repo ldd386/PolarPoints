@@ -89,6 +89,7 @@ class MainFragment : Fragment() {
         GlobalScope.launch {
             // getting Profile
             val profile = polarApi.loadProfile()
+            polarApi.createTransaction()
         }
     }
 }
