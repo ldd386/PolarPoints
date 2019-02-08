@@ -89,7 +89,14 @@ class MainFragment : Fragment() {
         GlobalScope.launch {
             // getting Profile
             val profile = polarApi.loadProfile()
-            polarApi.createTransaction()
+            val transaction = polarApi.createTransaction()
+            if(transaction == null){
+                Log.i("MainFragment", "no transaction id, exiting..")
+                return@launch
+            }
+            val exercises =  polarApi.listExercisesInTransaction(transaction!!.transactionId)
+            val exerciseId = exercises!!.exercisesId!!.last()
+            polarApi.getHeartRateZonesForExercise(transaction!!.transactionId, exerciseId)
         }
     }
 }

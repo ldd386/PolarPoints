@@ -3,6 +3,8 @@ package ch.example.polarpoints.api
 import android.util.Log
 import ch.example.polarpoints.api.adapters.LocalDateAdapter
 import ch.example.polarpoints.api.adapters.LocalTimeAdapter
+import ch.example.polarpoints.api.model.Exercises
+import ch.example.polarpoints.api.model.Transaction
 
 import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.OAuthRequest
@@ -80,7 +82,7 @@ class PolarApi {
         }
     }
 
-    fun createTransaction() {
+    fun createTransaction() : Transaction? {
         val transactionUrl = String.format(
             "https://www.polaraccesslink.com/v3/users/%s/exercise-transactions",accessToken!!.userId)
         Log.i(LOG_TAG, "Now we're going to create a transaction...")
@@ -93,13 +95,15 @@ class PolarApi {
         val response = service!!.execute(request)
         Log.i(LOG_TAG, "create transaction result code: " + response.code)
         Log.i(LOG_TAG, "create transaction result body: " + response.body)
+        val gson = getGson()
+        return gson.fromJson(response.body, Transaction::class.java)
     }
 
-    fun listExercisesInTransaction(transactionId : Int ) {
+    fun listExercisesInTransaction(transactionId : Int ): Exercises? {
         val transactionUrl = String.format(
-            "https://www.polaraccesslink.com/v3/users/%s/exercise-transactions/%s/exercises/%s",
+            "https://www.polaraccesslink.com/v3/users/%s/exercise-transactions/%s",
                 accessToken!!.userId, transactionId)
-        Log.i(LOG_TAG, "Now we're going to access the steps intra-day...")
+        Log.i(LOG_TAG, "Now we're going to access exercises In Transaction..")
         val request = OAuthRequest(
             Verb.GET,
             String.format(transactionUrl, accessToken!!.userId)
@@ -109,12 +113,25 @@ class PolarApi {
         val response = service!!.execute(request)
         Log.i(LOG_TAG, "create transaction result code: " + response.code)
         Log.i(LOG_TAG, "create transaction result body: " + response.body)
+        val gson = getGson()
+        return gson.fromJson(response.body, Exercises::class.java)
+
     }
 
     fun getHeartRateZonesForExercise(transactionId : Int, exerciseId : Int){
-        val transactionExerciseUrl = String.format(
+        val transactionExerciseHRZUrl = String.format(
             "https://www.polaraccesslink.com/v3/users/%s/exercise-transactions/%s/exercises/%s/heart-rate-zones",
             accessToken!!.userId, transactionId, exerciseId)
+        Log.i(LOG_TAG, "Now we're going to access exercises In Transaction..")
+        val request = OAuthRequest(
+            Verb.GET,
+            String.format(transactionExerciseHRZUrl, accessToken!!.userId)
+        )
+        request.addHeader("x-li-format", "json")
+        service!!.signRequest(accessToken, request)
+        val response = service!!.execute(request)
+        Log.i(LOG_TAG, "create transaction result code: " + response.code)
+        Log.i(LOG_TAG, "create transaction result body: " + response.body)
 
     }
     private fun getGson() : Gson {
