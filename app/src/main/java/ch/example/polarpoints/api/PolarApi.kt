@@ -3,10 +3,7 @@ package ch.example.polarpoints.api
 import android.util.Log
 import ch.example.polarpoints.api.adapters.LocalDateAdapter
 import ch.example.polarpoints.api.adapters.LocalTimeAdapter
-import ch.example.polarpoints.api.model.Activities
-import ch.example.polarpoints.api.model.Activity
-import ch.example.polarpoints.api.model.Exercises
-import ch.example.polarpoints.api.model.ExerciseTransaction
+import ch.example.polarpoints.api.model.*
 
 import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.model.OAuthRequest
@@ -147,6 +144,24 @@ class PolarApi {
         Log.i(LOG_TAG, "get heartrate in transaction result code: " + response.code)
         Log.i(LOG_TAG, "get heartrate in transaction result body: " + response.body)
 
+    }
+
+    fun getExerciseSummary(transactionId : Int, exerciseId : Int) : Exercise {
+        val activitySummaryUrl = String.format(
+            "https://www.polaraccesslink.com/v3/users/%s/exercise-transactions/%s/exercises/%s",
+            accessToken!!.userId, transactionId, exerciseId)
+        Log.i(LOG_TAG, "Now we're going to access exercise summary..")
+        val request = OAuthRequest(
+            Verb.GET,
+            activitySummaryUrl
+        )
+        request.addHeader("x-li-format", "json")
+        service!!.signRequest(accessToken, request)
+        val response = service!!.execute(request)
+        Log.i(LOG_TAG, "exercise summary result code: " + response.code)
+        Log.i(LOG_TAG, "exercise summary result body: " + response.body)
+        val gson = getGson()
+        return gson.fromJson(response.body, Exercise::class.java)
     }
 
     fun createActivityTransaction() : ExerciseTransaction? {
